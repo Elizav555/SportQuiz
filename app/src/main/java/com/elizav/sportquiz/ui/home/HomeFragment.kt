@@ -8,7 +8,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
@@ -18,6 +17,8 @@ import com.elizav.sportquiz.R
 import com.elizav.sportquiz.databinding.FragmentHomeBinding
 import com.elizav.sportquiz.domain.model.Command
 import com.elizav.sportquiz.domain.model.QuizItem
+import com.elizav.sportquiz.ui.utils.DialogParams
+import com.elizav.sportquiz.ui.utils.ShowDialog.showDialog
 import com.elizav.sportquiz.ui.viewPager.QuizAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
@@ -59,7 +60,7 @@ class HomeFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     R.id.action_restart -> {
-                        homeViewModel.getQuizItems()
+                        showRestartDialog()
                         return true
                     }
                     else -> false
@@ -97,21 +98,41 @@ class HomeFragment : Fragment() {
     }
 
     private fun showEndGameDialog(score: Int) {
-        val dialog = AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.dialog_end_title))
-            .setMessage(getString(R.string.dialog_end_message, score))
-            .setPositiveButton(
-                getString(R.string.new_game)
-            ) { dialog, _ ->
-                homeViewModel.getQuizItems()
+        showDialog(requireContext(), DialogParams(
+            getString(R.string.dialog_end_title),
+            getString(R.string.dialog_end_message, score),
+            getString(R.string.new_game),
+            { dialog, _ ->
+                restartGame()
                 dialog.dismiss()
-
-            }
-            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+            },
+            { dialog, _ ->
                 dialog?.cancel()
             }
-            .create()
-        dialog.show()
+        ))
+    }
+
+    private fun restartGame(){
+        homeViewModel.getQuizItems()
+        for (i in 0 until Int.MAX_VALUE) {
+            binding.tabLayout.getTabAt(i)
+                ?.let { tab -> tab.view.setBackgroundColor(Color.TRANSPARENT) } ?: break
+        }
+    }
+
+    private fun showRestartDialog() {
+        showDialog(requireContext(), DialogParams(
+            getString(R.string.action_restart),
+            getString(R.string.dialog_restart_message),
+            getString(R.string.new_game),
+            { dialog, _ ->
+                restartGame()
+                dialog.dismiss()
+            },
+            { dialog, _ ->
+                dialog?.cancel()
+            }
+        ))
     }
 
     private fun showSnackbar(text: String) = Snackbar.make(
