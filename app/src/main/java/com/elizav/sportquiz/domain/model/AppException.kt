@@ -1,0 +1,9 @@
+package com.elizav.sportquiz.domain.model
+
+sealed class AppException(message: String) : Exception(message) {
+    class ApiException(message: String = API_EX_MSG) : AppException(message)
+
+    companion object {
+        const val API_EX_MSG = "Api Error"
+    }
+}
