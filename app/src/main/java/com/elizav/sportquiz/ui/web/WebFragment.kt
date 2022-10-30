@@ -7,9 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.elizav.sportquiz.databinding.FragmentWebBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,6 +32,19 @@ class WebFragment() : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        with(binding.webView) {
+            requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
+                OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (canGoBack()) {
+                        goBack()
+                    } else {
+                        findNavController().popBackStack()
+                    }
+                }
+            })
+        }
+
         webViewModel.saveUrl(args.url)
         val webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {

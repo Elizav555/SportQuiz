@@ -23,14 +23,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun getUrl() = viewModelScope.launch {
-        _path.value = try {
+        try {
             preferencesInteractor.getUrl()?.let {
-                Result.success(it)
+                _path.value =   Result.success(it)
                 return@launch
             }
-            Result.success(configInteractor.getUrl())
+            _path.value =   Result.success(configInteractor.getUrl())
         } catch (ex: Exception) {
-            Result.failure(ex)
+            _path.value = Result.failure(ex)
         }
     }
 }

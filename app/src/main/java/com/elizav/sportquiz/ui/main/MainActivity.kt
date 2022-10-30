@@ -9,7 +9,6 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import com.elizav.sportquiz.R
 import com.elizav.sportquiz.databinding.ActivityMainBinding
 import com.elizav.sportquiz.domain.model.AppException.Companion.CONFIG_EX_MSG
@@ -32,23 +31,14 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
-
         navController = findNavController(R.id.nav_host_fragment_content_main)
-        setupActionBarWithNavController(navController)
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
     }
 
     private fun initObservers() = with(mainViewModel) {
         path.observe(this@MainActivity) {
             it.fold(
                 onSuccess = { url ->
-                    navController.navigateUp()
+                    navController.popBackStack(R.id.homeFragment, true);
                     navController.navigate(R.id.webFragment, args = bundleOf("url" to url))
                 },
                 onFailure = { ex ->
