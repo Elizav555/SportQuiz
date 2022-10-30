@@ -78,7 +78,10 @@ class HomeFragment : Fragment() {
         commands.observe(viewLifecycleOwner) { command ->
             when (command) {
                 is Command.HandleLoading -> showLoading(command.isLoading)
-                is Command.ShowEndGame -> showEndGameDialog(command.score)
+                is Command.ShowEndGame -> {
+                    checkTab(command.lastIsCorrect, binding.viewPager.currentItem)
+                    showEndGameDialog(command.score)
+                }
                 is Command.ShowError -> showSnackbar(command.message)
                 is Command.NextQuestion -> {
                     (activity as? MainActivity)?.changeTitle(
@@ -87,10 +90,7 @@ class HomeFragment : Fragment() {
                             command.score
                         )
                     )
-                    val color = if (command.isCorrect) Color.GREEN else Color.RED
-                    binding.tabLayout.getTabAt(command.newQuestion - 1)?.view?.setBackgroundColor(
-                        color
-                    )
+                    checkTab(command.isCorrect, command.newQuestion - 1)
                     binding.viewPager.currentItem = command.newQuestion
                 }
             }
@@ -104,6 +104,13 @@ class HomeFragment : Fragment() {
 
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.isVisible = isLoading
+    }
+
+    private fun checkTab(isCorrect: Boolean, index: Int) {
+        val color = if (isCorrect) Color.GREEN else Color.RED
+        binding.tabLayout.getTabAt(index)?.view?.setBackgroundColor(
+            color
+        )
     }
 
     private fun showEndGameDialog(score: Int) {
