@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         initObservers()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        setSupportActionBar(binding.toolbar)
         navController = findNavController(R.id.nav_host_fragment_content_main)
     }
 
