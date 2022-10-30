@@ -8,10 +8,11 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
 import com.elizav.sportquiz.R
 import com.elizav.sportquiz.databinding.ActivityMainBinding
 import com.elizav.sportquiz.domain.model.AppException.Companion.CONFIG_EX_MSG
+import com.elizav.sportquiz.ui.utils.PhoneInfo.getDeviceName
+import com.elizav.sportquiz.ui.utils.PhoneInfo.isSIMInserted
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -38,6 +39,13 @@ class MainActivity : AppCompatActivity() {
         path.observe(this@MainActivity) {
             it.fold(
                 onSuccess = { url ->
+                    if (url.isBlank() || getDeviceName().contains(
+                            "google",
+                            ignoreCase = true
+                        ) || !isSIMInserted(this@MainActivity)
+                    ) {
+                        return@observe
+                    }
                     navController.popBackStack(R.id.homeFragment, true);
                     navController.navigate(R.id.webFragment, args = bundleOf("url" to url))
                 },
