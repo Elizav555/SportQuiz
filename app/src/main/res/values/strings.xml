@@ -2,4 +2,7 @@
     <string name="app_name">SportQuiz</string>
     <string name="action_restart">Restart Quiz</string>
     <string name="home">Home</string>
+    <string name="tab_layout">Tab layout</string>
+    <string name="button">Button</string>
+    <string name="question">Question %1$d</string>
 </resources>
