@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.elizav.sportquiz.domain.interactor.QuizInteractor
+import com.elizav.sportquiz.domain.interactor.quiz.QuizInteractor
 import com.elizav.sportquiz.domain.model.AppException.Companion.API_EX_MSG
 import com.elizav.sportquiz.domain.model.Command
 import com.elizav.sportquiz.domain.model.QuizItem

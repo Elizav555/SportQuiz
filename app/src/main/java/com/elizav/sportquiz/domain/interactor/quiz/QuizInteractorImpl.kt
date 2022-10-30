@@ -1,4 +1,4 @@
-package com.elizav.sportquiz.domain.interactor
+package com.elizav.sportquiz.domain.interactor.quiz
 
 import com.elizav.sportquiz.domain.model.Category
 import com.elizav.sportquiz.domain.model.QuizItem

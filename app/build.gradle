@@ -3,7 +3,9 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'com.google.gms.google-services'
     id 'org.jetbrains.kotlin.plugin.serialization'
+    id "androidx.navigation.safeargs"
 }
 
 android {
@@ -18,6 +20,11 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+        buildConfigField "String", "SHARED_PREFERENCES_NAME", "\"${properties.getProperty('SHARED_PREFERENCES_NAME')}\""
     }
 
     buildTypes {
@@ -39,7 +46,13 @@ android {
 }
 
 dependencies {
+    //region Firebase
+    implementation platform('com.google.firebase:firebase-bom:30.4.1')
+    implementation 'com.google.firebase:firebase-config-ktx'
+    //endregion
+
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
+
     //region Hilt
     def hilt = "2.42"
     implementation "com.google.dagger:hilt-android:${hilt}"
@@ -50,6 +63,8 @@ dependencies {
     def nav_version = "2.5.3"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"{
+    }
     //endregion
 
     //region Retrofit
