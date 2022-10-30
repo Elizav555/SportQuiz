@@ -5,4 +5,8 @@
     <string name="tab_layout">Tab layout</string>
     <string name="button">Button</string>
     <string name="question">Question %1$d</string>
+    <string name="dialog_end_title">Quiz Over</string>
+    <string name="dialog_end_message">Your score is %1$d</string>
+    <string name="new_game">Start New Game</string>
+    <string name="cancel">Cancel</string>
 </resources>

@@ -11,11 +11,11 @@ data class QuizItem(
 ) {
     class DiffCallback : DiffUtil.ItemCallback<QuizItem>() {
         override fun areItemsTheSame(oldItem: QuizItem, newItem: QuizItem): Boolean {
-            return oldItem.id == newItem.id
+            return false
         }
 
         override fun areContentsTheSame(oldItem: QuizItem, newItem: QuizItem): Boolean {
-            return oldItem.question == newItem.question && oldItem.incorrectAnswers == newItem.incorrectAnswers
+            return false
         }
 
     }

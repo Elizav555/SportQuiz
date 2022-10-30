@@ -7,14 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.elizav.sportquiz.databinding.FragmentQuizBinding
 import com.elizav.sportquiz.domain.model.QuizItem
 import com.elizav.sportquiz.ui.home.HomeFragment
+import com.elizav.sportquiz.ui.home.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.random.Random
 
 @AndroidEntryPoint
-class QuizFragment(private val quizItem: QuizItem) : Fragment() {
+class QuizFragment(private val quizItem: QuizItem,private val onAnswer:(Boolean)->Unit) : Fragment() {
     private lateinit var binding: FragmentQuizBinding
     private var buttons = ArrayList<Button>(4)
 
@@ -48,14 +50,15 @@ class QuizFragment(private val quizItem: QuizItem) : Fragment() {
     }
 
     private fun onCorrectAnswer(id: Int) {
-        (parentFragment as? HomeFragment)?.addScorePoint()
         buttons.getOrNull(id)?.setBackgroundColor(Color.GREEN)
         deactivateButtons()
+       onAnswer(true)
     }
 
     private fun onWrongAnswer(id: Int) {
         buttons.getOrNull(id)?.setBackgroundColor(Color.RED)
         deactivateButtons()
+        onAnswer(false)
     }
 
     private fun deactivateButtons() {

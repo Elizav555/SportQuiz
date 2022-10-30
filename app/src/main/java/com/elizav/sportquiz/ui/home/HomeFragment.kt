@@ -7,6 +7,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.elizav.sportquiz.R
 import com.elizav.sportquiz.databinding.FragmentHomeBinding
+import com.elizav.sportquiz.domain.model.Command
 import com.elizav.sportquiz.domain.model.QuizItem
 import com.elizav.sportquiz.ui.viewPager.QuizAdapter
 import com.google.android.material.snackbar.Snackbar
@@ -25,8 +27,7 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var quizAdapter: QuizAdapter
     private val homeViewModel: HomeViewModel by viewModels()
-    private var score = 0
-//TODO swipe programmaticly only and show if question was correct
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,13 +37,15 @@ class HomeFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        quizAdapter = QuizAdapter(this)
+        quizAdapter = QuizAdapter(this) { isCorrect: Boolean -> homeViewModel.onAnswer(isCorrect) }
         binding.viewPager.apply {
             adapter = quizAdapter
+            isUserInputEnabled = false
         }
 
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
-            tab.text = getString(R.string.question, position+1)
+            tab.text = getString(R.string.question, position + 1)
+            tab.view.isClickable = false
         }.attach()
         initObservers()
 
@@ -55,7 +58,6 @@ class HomeFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     R.id.action_restart -> {
-                        showLoading(true)
                         homeViewModel.getQuizItems()
                         return true
                     }
@@ -66,18 +68,20 @@ class HomeFragment : Fragment() {
         menuHost.invalidateMenu()
     }
 
-    private fun initObservers() {
-        homeViewModel.quizItems.observe(viewLifecycleOwner) { result ->
-            result.fold(onSuccess = { quizList ->
-                submitQuizItems(quizList)
-            }, onFailure = {
-                showSnackbar(it.message.toString())
-            })
+    private fun initObservers() = with(homeViewModel) {
+        quizItems.observe(viewLifecycleOwner) { quizList ->
+            submitQuizItems(quizList)
         }
-    }
-
-    fun addScorePoint() {
-        score++
+        currentQuestion.observe(viewLifecycleOwner) {
+            binding.viewPager.currentItem = it
+        }
+        commands.observe(viewLifecycleOwner) {
+            when (it) {
+                is Command.HandleLoading -> showLoading(it.isLoading)
+                is Command.ShowEndGame -> showEndGameDialog(it.score)
+                is Command.ShowError -> showSnackbar(it.message)
+            }
+        }
     }
 
     private fun submitQuizItems(quizList: List<QuizItem>) {
@@ -89,19 +93,23 @@ class HomeFragment : Fragment() {
         binding.progressBar.isVisible = isLoading
     }
 
-//    private fun showEndGameDialog() = activity?.let {
-//        showDialog(it, DialogParams(
-//            title = getString(R.string.logout),
-//            message = getString(R.string.message_logout),
-//            submitBtnText = getString(R.string.yes),
-//            submitOnClickListener = { _, _ ->
-//                actions.onNext(HostAction.LogoutAction)
-//            },
-//            cancelOnClickListener = { dialog, _ ->
-//                dialog?.cancel()
-//            }
-//        ))
-//    }
+    private fun showEndGameDialog(score: Int) {
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.dialog_end_title))
+            .setMessage(getString(R.string.dialog_end_message, score))
+            .setPositiveButton(
+                getString(R.string.new_game)
+            ) { dialog, _ ->
+                homeViewModel.getQuizItems()
+                dialog.dismiss()
+
+            }
+            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+                dialog?.cancel()
+            }
+            .create()
+        dialog.show()
+    }
 
     private fun showSnackbar(text: String) = Snackbar.make(
         binding.root,
