@@ -1,5 +1,6 @@
 package com.elizav.sportquiz.ui.home
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -72,14 +73,16 @@ class HomeFragment : Fragment() {
         quizItems.observe(viewLifecycleOwner) { quizList ->
             submitQuizItems(quizList)
         }
-        currentQuestion.observe(viewLifecycleOwner) {
-            binding.viewPager.currentItem = it
-        }
         commands.observe(viewLifecycleOwner) {
             when (it) {
                 is Command.HandleLoading -> showLoading(it.isLoading)
                 is Command.ShowEndGame -> showEndGameDialog(it.score)
                 is Command.ShowError -> showSnackbar(it.message)
+                is Command.NextQuestion -> {
+                    val color = if (it.isCorrect) Color.GREEN else Color.RED
+                    binding.tabLayout.getTabAt(it.newQuestion - 1)?.view?.setBackgroundColor(color)
+                    binding.viewPager.currentItem = it.newQuestion
+                }
             }
         }
     }

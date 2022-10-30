@@ -20,9 +20,6 @@ class HomeViewModel @Inject constructor(
     private var _quizItems: MutableLiveData<List<QuizItem>> = MutableLiveData()
     val quizItems: LiveData<List<QuizItem>> = _quizItems
 
-    private var _currentQuestion: MutableLiveData<Int> = MutableLiveData()
-    val currentQuestion: LiveData<Int> = _currentQuestion
-
     private var _commands: MutableLiveData<Command> = MutableLiveData()
     val commands: LiveData<Command> = _commands
 
@@ -54,10 +51,10 @@ class HomeViewModel @Inject constructor(
             score++
         }
         current++
-        _quizItems.value?.size?.let {
+        _commands.value = _quizItems.value?.size?.let {
             if (current >= it) {
-                _commands.value = Command.ShowEndGame(score)
-            } else _currentQuestion.value = current
-        } ?: run { _commands.value = Command.ShowError(API_EX_MSG) }
+                Command.ShowEndGame(score)
+            } else Command.NextQuestion(isCorrect, current)
+        } ?: Command.ShowError(API_EX_MSG)
     }
 }
