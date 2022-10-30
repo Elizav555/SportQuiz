@@ -54,7 +54,7 @@ class HomeViewModel @Inject constructor(
         _commands.value = _quizItems.value?.size?.let {
             if (current >= it) {
                 Command.ShowEndGame(score)
-            } else Command.NextQuestion(isCorrect, current)
+            } else Command.NextQuestion(isCorrect, current, score)
         } ?: Command.ShowError(API_EX_MSG)
     }
 }

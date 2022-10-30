@@ -35,6 +35,10 @@ class MainActivity : AppCompatActivity() {
         navController = findNavController(R.id.nav_host_fragment_content_main)
     }
 
+    fun changeTitle(newTitle: String) {
+        binding.toolbar.title = newTitle
+    }
+
     private fun initObservers() = with(mainViewModel) {
         path.observe(this@MainActivity) {
             it.fold(

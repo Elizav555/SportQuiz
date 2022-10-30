@@ -17,6 +17,7 @@ import com.elizav.sportquiz.R
 import com.elizav.sportquiz.databinding.FragmentHomeBinding
 import com.elizav.sportquiz.domain.model.Command
 import com.elizav.sportquiz.domain.model.QuizItem
+import com.elizav.sportquiz.ui.main.MainActivity
 import com.elizav.sportquiz.ui.utils.DialogParams
 import com.elizav.sportquiz.ui.utils.ShowDialog.showDialog
 import com.elizav.sportquiz.ui.viewPager.QuizAdapter
@@ -74,15 +75,23 @@ class HomeFragment : Fragment() {
         quizItems.observe(viewLifecycleOwner) { quizList ->
             submitQuizItems(quizList)
         }
-        commands.observe(viewLifecycleOwner) {
-            when (it) {
-                is Command.HandleLoading -> showLoading(it.isLoading)
-                is Command.ShowEndGame -> showEndGameDialog(it.score)
-                is Command.ShowError -> showSnackbar(it.message)
+        commands.observe(viewLifecycleOwner) { command ->
+            when (command) {
+                is Command.HandleLoading -> showLoading(command.isLoading)
+                is Command.ShowEndGame -> showEndGameDialog(command.score)
+                is Command.ShowError -> showSnackbar(command.message)
                 is Command.NextQuestion -> {
-                    val color = if (it.isCorrect) Color.GREEN else Color.RED
-                    binding.tabLayout.getTabAt(it.newQuestion - 1)?.view?.setBackgroundColor(color)
-                    binding.viewPager.currentItem = it.newQuestion
+                    (activity as? MainActivity)?.changeTitle(
+                        getString(
+                            R.string.score,
+                            command.score
+                        )
+                    )
+                    val color = if (command.isCorrect) Color.GREEN else Color.RED
+                    binding.tabLayout.getTabAt(command.newQuestion - 1)?.view?.setBackgroundColor(
+                        color
+                    )
+                    binding.viewPager.currentItem = command.newQuestion
                 }
             }
         }
@@ -112,11 +121,15 @@ class HomeFragment : Fragment() {
         ))
     }
 
-    private fun restartGame(){
+    private fun restartGame() {
+        (activity as? MainActivity)?.changeTitle(
+            getString(
+                R.string.app_name
+            )
+        )
         homeViewModel.getQuizItems()
         for (i in 0 until Int.MAX_VALUE) {
-            binding.tabLayout.getTabAt(i)
-                ?.let { tab -> tab.view.setBackgroundColor(Color.TRANSPARENT) } ?: break
+            binding.tabLayout.getTabAt(i)?.view?.setBackgroundColor(Color.TRANSPARENT) ?: break
         }
     }
 
