@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SportQuiz</string>
+    <string name="action_restart">Restart Quiz</string>
+    <string name="home">Home</string>
+</resources>
